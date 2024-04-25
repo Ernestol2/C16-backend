@@ -12,7 +12,7 @@ const { getId } = require("../utils/youtubeHelper");
 // /api/materials?title=some-material-title //return material by title
 // /api/materials?page=page-number //return specific page
 exports.getAllMaterials = async (req, res) => {
-  const { page, size, title } = req.query;
+  const { page, size } = req.query;
   const searchTerm = req.query.search || "";
   const { currentPage, pageSize, offset } = getPagination(page, size);
   try {
