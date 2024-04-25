@@ -13,21 +13,21 @@ const { getId } = require("../utils/youtubeHelper");
 // /api/materials?page=page-number //return specific page
 exports.getAllMaterials = async (req, res) => {
   const { page, size, title } = req.query;
-  const condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+  const searchTerm = req.query.search || "";
   const { currentPage, pageSize, offset } = getPagination(page, size);
   try {
     const { count, rows } = await Material.findAndCountAll({
-      where: condition,
+      where: {
+        [Op.or]: [
+          { title: { [Op.iLike]: `%${searchTerm}%` } },
+          { description: { [Op.iLike]: `%${searchTerm}%` } },
+        ]
+      },
       offset,
       limit: pageSize,
       order: [["createdAt", "DESC"]],
     });
     const response = getPaginationData({ count, rows }, currentPage, pageSize);
-    if (response.data.length === 0 && title) {
-      return res
-        .status(404)
-        .json({ message: `No materials with title=${title} found` });
-    }
     res.json(response);
   } catch (error) {
     console.error("Error retrieving materials:", error);
